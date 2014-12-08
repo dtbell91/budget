@@ -1,19 +1,11 @@
 from django.contrib import admin
-from bills.models import Company, Service, Bill
+from bills.models import Service, Bill
 from income.models import Person, Employer, Job, Pay
 
 #start admin for Bills
-class ServiceInline(admin.TabularInline):
-    model = Service
-    extra = 2
-
 class BillInline(admin.TabularInline):
     model = Bill
     extra = 2
-
-class CompanyAdmin(admin.ModelAdmin):
-    {'fields': ['name']},
-    inlines = [ServiceInline]
 
 class ServiceAdmin(admin.ModelAdmin):
     fieldsets = [
@@ -22,7 +14,6 @@ class ServiceAdmin(admin.ModelAdmin):
     ]
     inlines = [BillInline]
 
-admin.site.register(Company, CompanyAdmin)
 admin.site.register(Service, ServiceAdmin)
 admin.site.register(Bill)
 # end admin for Bills

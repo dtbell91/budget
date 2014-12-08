@@ -5,14 +5,9 @@ from django.db.models import Avg
 from django.utils import timezone
 
 # Create your models here.
-class Company(models.Model):
-    name = models.CharField(max_length=200)
-    def __unicode__(self):
-        return self.name
-
 class Service(models.Model):
-    company = models.ForeignKey(Company)
-    name = models.CharField(max_length=200)
+    company_name = models.CharField(max_length=200)
+    service_name = models.CharField(max_length=200)
     cost = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     DAY = 1
     WEEK = 7
@@ -26,17 +21,30 @@ class Service(models.Model):
     )
     frequency_unit = models.DecimalField(max_digits=8, decimal_places=4, choices=FREQUENCY_CHOICES, default=DAY)
     frequency_count = models.IntegerField()
-    def __unicode__(self):
-        return self.company.__unicode__() + " - " + self.name
     
-    def average_bill(self, count):
+    def frequency_indays(self):
+        return self.frequency_unit * self.frequency_count
+    
+    def frequency_peryear(self):
+        return self.frequency_indays() / Decimal(self.YEAR)
+    
+    def __unicode__(self):
+        return self.company_name + " - " + self.service_name
+    
+    def average_bill_bycount(self, count):
         average = self.bill_set.order_by('date_paid').reverse()[:count].aggregate(Avg('cost'))
+        return average
+    
+    def average_bill_bydays(self, past_days):
+        enddate = datetime.today()
+        startdate = enddate - timedelta(days = past_days)
+        average = self.bill_set.filter(date_paid__range = [startdate, enddate]).aggregate(Avg('cost'))
         return average
     
     def sum_paid(self, past_days):
         sum = 0
         enddate = datetime.today()
-        startdate = enddate - timedelta(days=past_days)
+        startdate = enddate - timedelta(days = past_days)
         for b in self.bill_set.filter(date_paid__range=[startdate, enddate]).values_list('cost'):
             sum += b[0]
         return sum
