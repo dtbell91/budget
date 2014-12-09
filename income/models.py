@@ -9,15 +9,9 @@ class Person(models.Model):
     def __unicode__(self):
         return self.name
 
-class Employer(models.Model):
-    name = models.CharField(max_length=100)
-    
-    def __unicode__(self):
-        return self.name
-
 class Job(models.Model):
     person = models.ForeignKey(Person)
-    employer = models.ForeignKey(Employer)
+    employer = models.CharField(max_length=100)
     expected_salary = models.DecimalField(max_digits=9, decimal_places=2, default=0)
     DAY = 1
     WEEK = 7
@@ -33,7 +27,7 @@ class Job(models.Model):
     pay_frequency_count = models.IntegerField()
     
     def __unicode__(self):
-        return self.person.__unicode__() + " - " + self.employer.__unicode__()
+        return self.person.__unicode__() + " - " + self.employer
 
 class Pay(models.Model):
     job = models.ForeignKey(Job)

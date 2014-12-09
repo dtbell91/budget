@@ -23,10 +23,14 @@ class Service(models.Model):
     frequency_count = models.IntegerField()
     
     def frequency_indays(self):
-        return self.frequency_unit * self.frequency_count
+        days = self.frequency_unit * self.frequency_count
+        return round(days)
     
     def frequency_peryear(self):
-        return self.frequency_indays() / Decimal(self.YEAR)
+        return self.YEAR // float(self.frequency_indays())
+    
+    def expected_next_bill(self):
+        return self.bill_set.order_by('date_paid').last().date_paid + timedelta(days = self.frequency_indays())
     
     def __unicode__(self):
         return self.company_name + " - " + self.service_name
