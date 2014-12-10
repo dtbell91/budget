@@ -1,7 +1,7 @@
 from datetime import datetime
 from datetime import timedelta
 from django.db import models
-from django.db.models import Avg
+from django.db.models import Avg, Sum
 from django.utils import timezone
 
 # Create your models here.
@@ -32,6 +32,9 @@ class Service(models.Model):
     def expected_next_bill(self):
         return self.bill_set.order_by('date_paid').last().date_paid + timedelta(days = self.frequency_indays())
     
+    def expected_next_bill_indays(self):
+        return self.expected_next_bill().toordinal() - datetime.today().toordinal()
+    
     def __unicode__(self):
         return self.company_name + " - " + self.service_name
     
@@ -49,13 +52,17 @@ class Service(models.Model):
         sum = 0
         enddate = datetime.today()
         startdate = enddate - timedelta(days = past_days)
-        for b in self.bill_set.filter(date_paid__range=[startdate, enddate]).values_list('cost'):
-            sum += b[0]
+        sum = self.bill_set.filter(date_paid__range=[startdate, enddate]).aggregate(Sum('cost'))
         return sum
+    
+    def cost_perday(self):
+        cost = float(self.cost) / self.frequency_indays()
+        return round(cost,2)
 
 class Bill(models.Model):
     service = models.ForeignKey(Service)
     date_paid = models.DateField(default=datetime.now, blank=True)
     cost = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    
     def __unicode__(self):
         return self.service.__unicode__() + " - " + self.date_paid.strftime('%Y-%m-%d')
