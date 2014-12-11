@@ -3,11 +3,13 @@ from datetime import timedelta
 from django.db import models
 from django.db.models import Avg, Sum
 from django.utils import timezone
+from household.models import Household
 
 # Create your models here.
 class Service(models.Model):
     company_name = models.CharField(max_length=200)
     service_name = models.CharField(max_length=200)
+    household = models.ForeignKey(Household)
     cost = models.DecimalField(max_digits=6, decimal_places=2, default=0)
     DAY = 1
     WEEK = 7

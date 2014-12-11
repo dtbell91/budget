@@ -1,5 +1,6 @@
 from django.contrib import admin
 from income.models import Person, Job, Pay
+from household.models import Household
 
 # Register your models here.
 #start admin for Income
@@ -12,7 +13,7 @@ class PayInline(admin.TabularInline):
     extra = 12
 
 class PersonAdmin(admin.ModelAdmin):
-    {'fields': ['name']},
+    {'fields': ['name', 'household']},
     inlines = [JobInline]
 
 class JobAdmin(admin.ModelAdmin):

@@ -1,5 +1,6 @@
 from django.contrib import admin
 from bills.models import Service, Bill
+from household.models import Household
 
 #start admin for Bills
 class BillInline(admin.TabularInline):
@@ -8,7 +9,7 @@ class BillInline(admin.TabularInline):
 
 class ServiceAdmin(admin.ModelAdmin):
     fieldsets = [
-        (None,                      {'fields': ['company', 'name', 'cost']}),
+        (None,                      {'fields': ['company_name', 'service_name', 'cost', 'household']}),
         ('Frequency Information',   {'fields': ['frequency_unit', 'frequency_count']}),
     ]
     inlines = [BillInline]
